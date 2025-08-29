@@ -1,0 +1,47 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --background-primary: #121212;
+  --background-secondary: #1e1e1e;
+  --background-light: #2a2a2a;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --accent-primary: #3e92cc;
+  --accent-hover: #5aabf0;
+  --border-color: #333333;
+  --error-color: #cf6679;
+  --success-color: #69f0ae;
+
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: var(--text-primary);
+  background-color: var(--background-primary);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+a {
+  font-weight: 500;
+  color: var(--accent-primary);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--accent-hover);
+}
