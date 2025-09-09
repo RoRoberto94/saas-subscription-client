@@ -18,6 +18,9 @@ const Navbar: React.FC = () => {
         <Link to={isAuthenticated ? "/dashboard" : "/"}>Subscribe</Link>
       </div>
       <div className={styles.navLinks}>
+        <Link to="/pricing" className={styles.navLink}>
+          Pricing
+        </Link>
         {isAuthenticated ? (
           <>
             <span className={styles.userInfo}>{user?.email}</span>

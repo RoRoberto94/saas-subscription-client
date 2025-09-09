@@ -24,16 +24,17 @@ const LoginPage: React.FC = () => {
       );
       const { token } = loginResponse.data;
 
-      localStorage.setItem("authToken", token);
-
-      const meResponse = await apiClient.get("/auth/me");
+      const meResponse = await apiClient.get("/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const user = meResponse.data;
 
       login(user, token);
 
       navigate("/dashboard");
     } catch (err) {
-      localStorage.removeItem("authToken");
       if (err instanceof AxiosError) {
         const errorMessage =
           err.response?.data?.message ||

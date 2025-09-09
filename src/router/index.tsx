@@ -1,10 +1,12 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Root from "./Root";
 import RegisterPage from "../pages/Register";
 import LoginPage from "../pages/Login";
-import ProtectedRoute from "./ProtectedRoute";
 import MainLayout from "../components/Layout/MainLayout";
 import DashboardPage from "../pages/Dashboard";
+import PricingPage from "../pages/Pricing";
 
+// Centralized routing configuration with a root layout for auth checks.
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -15,18 +17,22 @@ const router = createBrowserRouter([
     element: <RegisterPage />,
   },
   {
-    element: <MainLayout />,
+    element: <Root />,
     children: [
       {
-        path: "/",
-        element: <div>Pagina principala(Home)</div>,
-      },
-      {
-        element: <ProtectedRoute />,
+        element: <MainLayout />,
         children: [
+          {
+            path: "/",
+            element: <DashboardPage />,
+          },
           {
             path: "/dashboard",
             element: <DashboardPage />,
+          },
+          {
+            path: "/pricing",
+            element: <PricingPage />,
           },
         ],
       },
