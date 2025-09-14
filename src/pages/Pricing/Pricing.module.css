@@ -17,6 +17,25 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.currentPlan {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(62, 146, 204, 0.3);
+}
+
+.currentPlanBadge {
+  position: absolute;
+  top: 15px;
+  right: -45px;
+  background-color: var(--accent-primary);
+  color: white;
+  padding: 5px 40px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transform: rotate(45deg);
 }
 
 .planName {
@@ -73,4 +92,22 @@
 .subscribeButton:disabled {
   background-color: var(--background-light);
   cursor: not-allowed;
+}
+
+.upgradeButton {
+  background-color: var(--success-color);
+  color: var(--background-primary);
+}
+.upgradeButton:hover {
+  background-color: #81ffc4;
+}
+
+.downgradeButton {
+  background-color: transparent;
+  border: 1px solid var(--text-secondary);
+  color: var(--text-secondary);
+}
+.downgradeButton:hover {
+  background-color: var(--text-secondary);
+  color: var(--background-primary);
 }
