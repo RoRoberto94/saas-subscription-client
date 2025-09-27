@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import styles from "./Dashboard.module.css";
 import { useAuth } from "../../hooks/useAuth";
 import apiClient from "../../lib/axios";
@@ -9,10 +10,9 @@ import { AxiosError } from "axios";
 
 interface Subscription {
   id: string;
-  userId: string;
-  stripeSubscriptionId: string;
-  stripeCurrentPeriodEnd: string;
   planName: string;
+  cancelAtPeriodEnd: boolean;
+  stripeCurrentPeriodEnd: string;
 }
 
 const DashboardPage: React.FC = () => {
@@ -21,33 +21,58 @@ const DashboardPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const fetchSubscription = useCallback(async () => {
-    setIsLoading(true);
+  const checkDataAndNotifications = useCallback(async () => {
+    const successMsg = localStorage.getItem("pending_notification_success");
+    if (successMsg) {
+      toast.success(successMsg, { duration: 5000 });
+      localStorage.removeItem("pending_notification_success");
+    }
+    const errorMsg = localStorage.getItem("pending_notification_error");
+    if (errorMsg) {
+      toast.error(errorMsg, {
+        duration: 5000,
+        iconTheme: {
+          primary: "var(--error-color)",
+          secondary: "#FFFFFF",
+        },
+      });
+      localStorage.removeItem("pending_notification_error");
+    }
+
     try {
       const response = await apiClient.get("/billing/subscription");
       setSubscription(response.data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError && error.response?.status !== 404) {
+    } catch (error) {
+      if (!(error instanceof AxiosError && error.response?.status !== 404)) {
         console.error("Failed to fetch subscription:", error);
       }
       setSubscription(null);
-    } finally {
-      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    // On component mount, check for URL params from Stripe redirect to force a data refresh.
-    const paymentSuccess = searchParams.get("payment_success");
+    const initialLoad = async () => {
+      setIsLoading(true);
+      await checkDataAndNotifications();
+      setIsLoading(false);
+    };
 
+    const paymentSuccess = searchParams.get("payment_success");
     if (paymentSuccess) {
-      console.log("Payment successful! Refreshing subscription data.");
+      toast.success("Payment successful! Your subscription is now active.", {
+        duration: 5000,
+      });
       searchParams.delete("payment_success");
-      setSearchParams(searchParams);
+      setSearchParams(searchParams, { replace: true });
     }
 
-    fetchSubscription();
-  }, [fetchSubscription, searchParams, setSearchParams]);
+    initialLoad();
+
+    window.addEventListener("focus", checkDataAndNotifications);
+    return () => {
+      window.removeEventListener("focus", checkDataAndNotifications);
+    };
+  }, [checkDataAndNotifications, searchParams, setSearchParams]);
 
   return (
     <div className={styles.dashboardContainer}>
@@ -55,7 +80,6 @@ const DashboardPage: React.FC = () => {
       <p className={styles.welcomeSubtitle}>
         Manage your account and subscription here.
       </p>
-
       {isLoading ? (
         <p>Loading subscription details...</p>
       ) : subscription ? (

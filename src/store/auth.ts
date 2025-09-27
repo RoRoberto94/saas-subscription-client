@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { socket } from "../lib/socket";
 
 interface User {
   id: string;
@@ -31,6 +32,10 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         set({ user: null, token: null, isAuthenticated: false });
         localStorage.removeItem("authToken");
+        if (socket.connected) {
+          socket.disconnect();
+          console.log("[DEBUG] Socket disconnected on logout.");
+        }
       },
 
       setUser: (user) => set({ user }),

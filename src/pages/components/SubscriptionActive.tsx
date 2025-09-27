@@ -5,6 +5,7 @@ import apiClient from "../../lib/axios";
 interface Subscription {
   planName: string;
   stripeCurrentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
 }
 
 interface SubscriptionActiveProps {
@@ -23,9 +24,10 @@ const SubscriptionActive: React.FC<SubscriptionActiveProps> = ({
         "/billing/customer-portal",
         { clientUrl: window.location.origin }
       );
-      window.location.href = response.data.url;
+      window.open(response.data.url, "_blank");
     } catch (error) {
       console.error("Failed to create customer portal session:", error);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -38,11 +40,19 @@ const SubscriptionActive: React.FC<SubscriptionActiveProps> = ({
         <strong>{subscription.planName}</strong>
       </div>
       <div className={styles.detail}>
-        <span>Renews on:</span>
+        <span>
+          {subscription.cancelAtPeriodEnd ? "Cancels on:" : "Renews on:"}
+        </span>
         <strong>
           {new Date(subscription.stripeCurrentPeriodEnd).toLocaleDateString()}
         </strong>
       </div>
+      {subscription.cancelAtPeriodEnd && (
+        <p className={styles.cancelWarning}>
+          Your plan will not renew. You will lose access after the cancellation
+          date.
+        </p>
+      )}
       <button
         onClick={handleManageSubscription}
         className={styles.button}
