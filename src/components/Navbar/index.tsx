@@ -23,6 +23,11 @@ const Navbar: React.FC = () => {
         </Link>
         {isAuthenticated ? (
           <>
+            {user?.role === "ADMIN" && (
+              <Link to="/admin" className={styles.navLink}>
+                Admin
+              </Link>
+            )}
             <span className={styles.userInfo}>{user?.email}</span>
             <button onClick={handleLogout} className={styles.logoutButton}>
               Logout

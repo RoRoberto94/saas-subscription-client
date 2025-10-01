@@ -5,6 +5,8 @@ import LoginPage from "../pages/Login";
 import MainLayout from "../components/Layout/MainLayout";
 import DashboardPage from "../pages/Dashboard";
 import PricingPage from "../pages/Pricing";
+import AdminRoute from "./AdminRoute";
+import AdminPage from "../pages/Admin";
 
 // Centralized routing configuration with a root layout for auth checks.
 const router = createBrowserRouter([
@@ -33,6 +35,15 @@ const router = createBrowserRouter([
           {
             path: "/pricing",
             element: <PricingPage />,
+          },
+          {
+            element: <AdminRoute />,
+            children: [
+              {
+                path: "/admin",
+                element: <AdminPage />,
+              },
+            ],
           },
         ],
       },
