@@ -5,6 +5,7 @@ import styles from "./Register.module.css";
 import PageContainer from "../../components/Layout/PageContainer";
 import apiClient from "../../lib/axios";
 import { useAuthStore } from "../../store/auth";
+import LoadingButton from "../../components/LoadingButton";
 
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -12,10 +13,12 @@ const RegisterPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { login } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsSubmitting(true);
 
     try {
       await apiClient.post("/auth/register", { email, password });
@@ -45,6 +48,8 @@ const RegisterPage: React.FC = () => {
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -52,37 +57,39 @@ const RegisterPage: React.FC = () => {
     <PageContainer>
       <h1 className={styles.title}>Create an Account</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <p style={{ color: "var(--error-color)" }}>{error}</p>}
-        <div className={styles.inputGroup}>
-          <label htmlFor="email" className={styles.label}>
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            className={styles.input}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className={styles.inputGroup}>
-          <label htmlFor="password" className={styles.label}>
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            className={styles.input}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
-        </div>
-        <button type="submit" className={styles.button}>
+        <fieldset disabled={isSubmitting}>
+          {error && <p style={{ color: "var(--error-color)" }}>{error}</p>}
+          <div className={styles.inputGroup}>
+            <label htmlFor="email" className={styles.label}>
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              className={styles.input}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className={styles.inputGroup}>
+            <label htmlFor="password" className={styles.label}>
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              className={styles.input}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </div>
+        </fieldset>
+        <LoadingButton type="submit" isLoading={isSubmitting}>
           Register
-        </button>
+        </LoadingButton>
       </form>
       <p className={styles.loginPrompt}>
         Already have an account? <Link to="/login">Log in</Link>

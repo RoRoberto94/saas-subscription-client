@@ -1,7 +1,13 @@
 .dashboardContainer {
-  padding: 2rem;
+  padding: 2rem 1rem;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .dashboardContainer {
+    padding: 2rem;
+  }
 }
 
 .welcomeTitle {
@@ -9,6 +15,8 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .welcomeSubtitle {

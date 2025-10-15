@@ -8,7 +8,8 @@ const MainLayout: React.FC = () => {
   useSocket();
 
   return (
-    <div>
+    <>
+      <Navbar />
       <Toaster
         position="bottom-right"
         reverseOrder={false}
@@ -20,11 +21,8 @@ const MainLayout: React.FC = () => {
           },
         }}
       />
-      <Navbar />
-      <main>
-        <Outlet />
-      </main>
-    </div>
+      <Outlet />
+    </>
   );
 };
 

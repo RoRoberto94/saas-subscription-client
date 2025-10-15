@@ -7,6 +7,7 @@ import apiClient from "../../lib/axios";
 import SubscriptionActive from "../components/SubscriptionActive";
 import NoSubscription from "../components/NoSubscription";
 import { AxiosError } from "axios";
+import Spinner from "../../components/Spinner";
 
 interface Subscription {
   id: string;
@@ -81,7 +82,11 @@ const DashboardPage: React.FC = () => {
         Manage your account and subscription here.
       </p>
       {isLoading ? (
-        <p>Loading subscription details...</p>
+        <div
+          style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
+        >
+          <Spinner />
+        </div>
       ) : subscription ? (
         <SubscriptionActive subscription={subscription} />
       ) : (

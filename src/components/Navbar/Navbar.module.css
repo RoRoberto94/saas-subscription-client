@@ -1,28 +1,40 @@
-.navbar {
-  width: 100%;
-  padding: 1rem 2rem;
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   background-color: var(--background-secondary);
   border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .logo a {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
   text-decoration: none;
-  color: inherit;
+  margin-right: 1.5rem;
 }
 
-.navLinks {
+.desktopMenu {
+  display: none;
+}
+.desktopAuthLinks {
+  display: none;
+}
+
+.userActions {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .navLink {
@@ -31,27 +43,135 @@
   font-weight: 500;
   transition: color 0.2s;
 }
-
 .navLink:hover {
   color: var(--text-primary);
 }
 
 .userInfo {
+  display: none;
   color: var(--text-primary);
+  font-size: 0.9rem;
 }
 
 .logoutButton {
   background-color: transparent;
   border: 1px solid var(--accent-primary);
   color: var(--accent-primary);
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
-
 .logoutButton:hover {
   background-color: var(--accent-primary);
   color: white;
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 1.8rem;
+  height: 1.8rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 101;
+  margin-left: 1rem;
+}
+.hamburger:hover .hamburgerBar {
+  background-color: var(--accent-hover);
+}
+.hamburgerBar {
+  width: 1.8rem;
+  height: 0.2rem;
+  background: var(--text-primary);
+  border-radius: 10px;
+  transition: all 0.3s linear;
+}
+
+.hamburgerActive .hamburgerBar:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.hamburgerActive .hamburgerBar:nth-child(2) {
+  opacity: 0;
+}
+.hamburgerActive .hamburgerBar:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--background-secondary);
+  border-bottom: 1px solid var(--border-color);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+  z-index: 99;
+}
+.mobileMenuOpen {
+  max-height: 500px;
+  padding: 1.5rem 0;
+}
+.mobileMenuContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.mobileMenuContent a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+.mobileUserInfo {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+  width: 80%;
+  text-align: center;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+@media (min-width: 768px) {
+  .navbar {
+    padding: 1rem 2rem;
+  }
+  .hamburger,
+  .mobileMenu {
+    display: none;
+  }
+
+  .desktopMenu {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-grow: 1;
+  }
+
+  .userActions {
+    margin-left: 0;
+  }
+  .userInfo {
+    display: block;
+    font-size: 1rem;
+  }
+  .desktopAuthLinks {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .logoutButton {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+  }
 }
