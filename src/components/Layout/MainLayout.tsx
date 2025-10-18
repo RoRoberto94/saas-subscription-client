@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "../Navbar";
 import { useSocket } from "../../hooks/useSocket";
+import DemoGuide from "../DemoGuide";
 
 const MainLayout: React.FC = () => {
   useSocket();
@@ -21,6 +22,7 @@ const MainLayout: React.FC = () => {
           },
         }}
       />
+      <DemoGuide />
       <Outlet />
     </>
   );

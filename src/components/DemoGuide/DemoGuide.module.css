@@ -1,0 +1,45 @@
+.guideBanner {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  background-color: var(--background-light);
+  color: var(--text-secondary);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  max-width: 350px;
+  font-size: 0.9rem;
+}
+.title {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.infoList {
+  list-style: none;
+  padding-left: 0.5rem;
+}
+.infoList li {
+  margin-bottom: 0.5rem;
+}
+.infoList code {
+  background-color: var(--background-secondary);
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: var(--accent-hover);
+}
+.closeButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
