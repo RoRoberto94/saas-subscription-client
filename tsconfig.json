@@ -22,6 +22,6 @@
 
     "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", "setupTests.ts"],
+  "include": ["src", "setupTests.ts", "playwright.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
