@@ -1,69 +1,77 @@
-# React + TypeScript + Vite
+# SubScribe - Full Stack SaaS Subscription App (Client)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Demo GIF of SubScribe App](./docs/demo.gif)
 
-Currently, two official plugins are available:
+> **💡 Demo Guide:**
+>
+> - **Admin Access:** `admin.demo@sub.scribe` / `Password123!`
+> - **Stripe Test Card:** `4242 4242 4242 4242` (any future date & 3-digit CVC)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 📋 About The Project
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+SubScribe is a complete Full Stack SaaS (Software as a Service) application that demonstrates a modern, robust, and scalable architecture for handling user authentication, role-based access, and subscription billing with Stripe. This project was built from the ground up to showcase advanced concepts and best practices in web development.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+This repository contains the **front-end client**, built with React, TypeScript, and Vite.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+➡️ **[Link to the Back-end Server Repository](https://github.com/RoRoberto94/saas-subscription-server)**
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ✨ Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **User Authentication:** Secure JWT (JSON Web Token) based registration and login flow.
+- **Role-Based Access Control (RBAC):** Differentiated experience for `USER` and `ADMIN` roles, with protected admin routes.
+- **Stripe Integration:** Full subscription lifecycle management, including creating subscriptions via Stripe Checkout and managing them through the Stripe Customer Portal.
+- **Real-time Notifications:** WebSocket (Socket.IO) integration to provide instant feedback to users upon successful payments or subscription status changes.
+- **Responsive UI:** Modern, dark-themed interface built with CSS Modules, fully responsive for both desktop and mobile devices.
+- **Comprehensive Testing:**
+  - **Component Tests** with Vitest & React Testing Library.
+  - **End-to-End Tests** with Playwright, ensuring critical user flows work as expected.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## 🛠️ Tech Stack
+
+| Category    | Technology                                                                                                                                                                                                                                                                                              |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Core**    | ![React](https://img.shields.io/badge/-React-61DAFB?logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/-Vite-646CFF?logo=vite&logoColor=white)                                             |
+| **Styling** | ![CSS Modules](https://img.shields.io/badge/-CSS%20Modules-000000?logo=css3&logoColor=white)                                                                                                                                                                                                            |
+| **Routing** | ![React Router](https://img.shields.io/badge/-React%20Router-CA4245?logo=react-router&logoColor=white)                                                                                                                                                                                                  |
+| **State**   | ![Zustand](https://img.shields.io/badge/-Zustand-764ABC)                                                                                                                                                                                                                                                |
+| **API**     | ![Axios](https://img.shields.io/badge/-Axios-5A29E4?logo=axios&logoColor=white) ![Socket.IO](https://img.shields.io/badge/-Socket.IO-010101?logo=socket.io&logoColor=white)                                                                                                                             |
+| **Testing** | ![Vitest](https://img.shields.io/badge/-Vitest-6E9F18?logo=vitest&logoColor=white) ![React Testing Library](https://img.shields.io/badge/-Testing%20Library-E33332?logo=testing-library&logoColor=white) ![Playwright](https://img.shields.io/badge/-Playwright-2EAD33?logo=playwright&logoColor=white) |
+
+---
+
+## ⚙️ Running Locally
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/RoRoberto94/saas-subscription-client.git
+    cd saas-subscription-client
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+3.  **Set up environment variables:**
+
+    - Create a `.env.local` file in the root of the `client` directory.
+    - Add the back-end API URL:
+      ```
+      VITE_API_BASE_URL=http://localhost:3001/api
+      ```
+
+4.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
+    The application will be available at `http://localhost:5173`.
+
+> **Note:** The back-end server must be running for the application to function correctly. Please refer to the [server repository's README](https://github.com/RoRoberto94/saas-subscription-server) for setup instructions.
