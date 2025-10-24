@@ -8,6 +8,7 @@ import SubscriptionActive from "../components/SubscriptionActive";
 import NoSubscription from "../components/NoSubscription";
 import { AxiosError } from "axios";
 import Spinner from "../../components/Spinner";
+import { socket } from "../../lib/socket";
 
 interface Subscription {
   id: string;
@@ -22,39 +23,40 @@ const DashboardPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const checkDataAndNotifications = useCallback(async () => {
-    const successMsg = localStorage.getItem("pending_notification_success");
-    if (successMsg) {
-      toast.success(successMsg, { duration: 5000 });
-      localStorage.removeItem("pending_notification_success");
-    }
-    const errorMsg = localStorage.getItem("pending_notification_error");
-    if (errorMsg) {
-      toast.error(errorMsg, {
-        duration: 5000,
-        iconTheme: {
-          primary: "var(--error-color)",
-          secondary: "#FFFFFF",
-        },
-      });
-      localStorage.removeItem("pending_notification_error");
-    }
-
+  const fetchSubscription = useCallback(async () => {
     try {
       const response = await apiClient.get("/billing/subscription");
       setSubscription(response.data);
-    } catch (error) {
-      if (!(error instanceof AxiosError && error.response?.status !== 404)) {
+    } catch (error: unknown) {
+      if (error instanceof AxiosError && error.response?.status !== 404) {
         console.error("Failed to fetch subscription:", error);
+      } else {
+        setSubscription(null);
       }
-      setSubscription(null);
     }
   }, []);
 
   useEffect(() => {
+    const handleSubscriptionChange = (data?: { status?: string }) => {
+      // Re-fetch subscription data on real-time event from backend.
+      console.log(
+        "WebSocket event received: subscription_changed. Refetching data..."
+      );
+
+      if (data?.status === "canceled") {
+        toast.error(
+          "Your subscription will be canceled at the end of the period."
+        );
+      } else if (data?.status === "updated") {
+        toast.success("Your subscription has been successfully updated!");
+      }
+
+      fetchSubscription();
+    };
+
     const initialLoad = async () => {
       setIsLoading(true);
-      await checkDataAndNotifications();
+      await fetchSubscription();
       setIsLoading(false);
     };
 
@@ -69,11 +71,14 @@ const DashboardPage: React.FC = () => {
 
     initialLoad();
 
-    window.addEventListener("focus", checkDataAndNotifications);
+    socket.on("local_subscription_changed", handleSubscriptionChange);
+    window.addEventListener("focus", fetchSubscription);
+
     return () => {
-      window.removeEventListener("focus", checkDataAndNotifications);
+      socket.off("local_subscription_changed", handleSubscriptionChange);
+      window.removeEventListener("focus", fetchSubscription);
     };
-  }, [checkDataAndNotifications, searchParams, setSearchParams]);
+  }, [fetchSubscription, searchParams, setSearchParams]);
 
   return (
     <div className={styles.dashboardContainer}>

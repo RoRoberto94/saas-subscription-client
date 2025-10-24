@@ -11,24 +11,18 @@ export const useSocket = () => {
         socket.connect();
       }
 
-      socket.on("connect", () => {
+      const handleConnect = () => {
         console.log("Connected to WebSocket server with ID:", socket.id);
         socket.emit("join_user_room", user.id);
-      });
+      };
 
-      socket.on("subscription_updated", () => {
-        localStorage.setItem(
-          "pending_notification_success",
-          "Your subscription has been updated!"
-        );
-      });
+      const handleSubscriptionChanged = (data?: { status?: string }) => {
+        // Emit a local event that other components can listen to.
+        socket.emit("local_subscription_changed", data);
+      };
 
-      socket.on("subscription_canceled", () => {
-        localStorage.setItem(
-          "pending_notification_error",
-          "Your subscription will be canceled at the end of the period."
-        );
-      });
+      socket.on("connect", handleConnect);
+      socket.on("subscription_changed", handleSubscriptionChanged);
     } else {
       if (socket.connected) {
         socket.disconnect();
@@ -37,8 +31,7 @@ export const useSocket = () => {
 
     return () => {
       socket.off("connect");
-      socket.off("subscription_updated");
-      socket.off("subscription_canceled");
+      socket.off("subscription_changed");
     };
   }, [user]);
 };
