@@ -49,6 +49,8 @@ const DashboardPage: React.FC = () => {
         );
       } else if (data?.status === "updated") {
         toast.success("Your subscription has been successfully updated!");
+      } else if (data?.status === "deleted") {
+        toast.error("Your subscription has been removed.");
       }
 
       fetchSubscription();
