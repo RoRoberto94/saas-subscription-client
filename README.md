@@ -1,4 +1,4 @@
-# SubScribe - Full Stack SaaS Subscription App (Client)
+# Subscribe - Full Stack SaaS Subscription App (Client)
 
 ![Demo GIF of SubScribe App](./docs/demo.gif)
 
