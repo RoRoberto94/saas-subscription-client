@@ -2,6 +2,10 @@
 
 ![Demo GIF of SubScribe App](./docs/demo.gif)
 
+## 🚀 Live Demo
+
+**[Explore the live application here!](https://saas-subscription-client.vercel.app)**
+
 > **💡 Demo Guide:**
 >
 > - **Admin Access:** `admin.demo@sub.scribe` / `Password123!`
