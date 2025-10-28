@@ -4,6 +4,7 @@ import styles from "./Pricing.module.css";
 import apiClient from "../../lib/axios";
 import { useAuth } from "../../hooks/useAuth";
 import { AxiosError } from "axios";
+import Spinner from "../../components/Spinner";
 
 interface Plan {
   name: string;
@@ -21,30 +22,30 @@ const PricingPage: React.FC = () => {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [currentSubscription, setCurrentSubscription] =
     useState<Subscription | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
         const plansResponse = await apiClient.get("/billing/plans");
         setPlans(plansResponse.data);
-      } catch (error) {
-        console.error("CRITICAL: Failed to fetch plans.", error);
-      }
 
-      if (isAuthenticated) {
-        try {
+        if (isAuthenticated) {
           const subscriptionResponse = await apiClient.get(
             "/billing/subscription"
           );
           setCurrentSubscription(subscriptionResponse.data);
-        } catch (error) {
-          if (error instanceof AxiosError && error.response?.status !== 404) {
-            console.error("Failed to fetch subscription status:", error);
-          }
-          setCurrentSubscription(null);
         }
+      } catch (error) {
+        if (error instanceof AxiosError && error.response?.status !== 404) {
+          console.error("Failed to fetch pricing data:", error);
+        }
+        setCurrentSubscription(null);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -82,6 +83,16 @@ const PricingPage: React.FC = () => {
       setProcessingId(null);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div
+        style={{ display: "flex", justifyContent: "center", padding: "4rem" }}
+      >
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.pricingContainer}>
@@ -139,7 +150,9 @@ const PricingPage: React.FC = () => {
             </p>
             <ul className={styles.featureList}>
               {plan.features.map((feature, index) => (
-                <li key={index}>✓ {feature}</li>
+                <li key={index} className={styles.featureItem}>
+                  ✓ {feature}
+                </li>
               ))}
             </ul>
             <button
