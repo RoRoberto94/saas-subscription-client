@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { socket } from "../lib/socket";
 import { useAuthStore } from "../store/auth";
-import toast from "react-hot-toast";
 
 export const useSocket = () => {
   const user = useAuthStore((state) => state.user);
@@ -18,16 +17,27 @@ export const useSocket = () => {
       const handleConnect = () => socket.emit("join_user_room", user.id);
 
       const handleSubscriptionChanged = (data?: { status?: string }) => {
-        console.log("WebSocket event received on hook:", data);
+        console.log(
+          "WebSocket event received on hook, storing notification:",
+          data
+        );
 
+        // Store notification in localStorage to be displayed when the tab becomes active.
         if (data?.status === "canceled") {
-          toast.error(
+          localStorage.setItem(
+            "pending_notification_error",
             "Your subscription will be canceled at the end of the period."
           );
         } else if (data?.status === "updated") {
-          toast.success("Your subscription has been successfully updated!");
+          localStorage.setItem(
+            "pending_notification_success",
+            "Your subscription has been successfully updated!"
+          );
         } else if (data?.status === "deleted") {
-          toast.error("Your subscription has been removed.");
+          localStorage.setItem(
+            "pending_notification_error",
+            "Your subscription has been removed."
+          );
         }
 
         triggerSubscriptionUpdate();

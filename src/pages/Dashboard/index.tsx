@@ -42,7 +42,34 @@ const DashboardPage: React.FC = () => {
     }
   }, []);
 
+  const checkAndShowNotifications = useCallback(() => {
+    const successMsg = localStorage.getItem("pending_notification_success");
+    if (successMsg) {
+      toast.success(successMsg, { duration: 5000 });
+      localStorage.removeItem("pending_notification_success");
+    }
+
+    const errorMsg = localStorage.getItem("pending_notification_error");
+    if (errorMsg) {
+      toast.error(errorMsg, {
+        duration: 5000,
+        iconTheme: {
+          primary: "var(--error-color)",
+          secondary: "#FFFFFF",
+        },
+      });
+      localStorage.removeItem("pending_notification_error");
+    }
+  }, []);
+
   useEffect(() => {
+    const initialLoad = async () => {
+      setIsLoading(true);
+      await fetchSubscription();
+      checkAndShowNotifications();
+      setIsLoading(false);
+    };
+
     const paymentSuccess = searchParams.get("payment_success");
     if (paymentSuccess) {
       toast.success("Payment successful! Your subscription is now active.", {
@@ -52,18 +79,19 @@ const DashboardPage: React.FC = () => {
       setSearchParams(searchParams, { replace: true });
     }
 
-    fetchSubscription();
+    initialLoad();
 
-    window.addEventListener("focus", fetchSubscription);
+    window.addEventListener("focus", checkAndShowNotifications);
 
     return () => {
-      window.removeEventListener("focus", fetchSubscription);
+      window.removeEventListener("focus", checkAndShowNotifications);
     };
   }, [
     fetchSubscription,
     searchParams,
     setSearchParams,
     subscriptionUpdateCounter,
+    checkAndShowNotifications,
   ]);
 
   return (
