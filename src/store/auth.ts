@@ -16,6 +16,8 @@ interface AuthState {
   login: (user: User, token: string) => void;
   logout: () => void;
   setUser: (user: User | null) => void;
+  subscriptionUpdateCounter: number;
+  triggerSubscriptionUpdate: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -24,6 +26,12 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
+
+      subscriptionUpdateCounter: 0,
+      triggerSubscriptionUpdate: () =>
+        set((state) => ({
+          subscriptionUpdateCounter: state.subscriptionUpdateCounter + 1,
+        })),
 
       login: (user, token) => {
         set({ user, token, isAuthenticated: true });

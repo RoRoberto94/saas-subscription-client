@@ -8,7 +8,7 @@ import SubscriptionActive from "../components/SubscriptionActive";
 import NoSubscription from "../components/NoSubscription";
 import { AxiosError } from "axios";
 import Spinner from "../../components/Spinner";
-import { socket } from "../../lib/socket";
+import { useAuthStore } from "../../store/auth";
 
 interface Subscription {
   id: string;
@@ -22,8 +22,12 @@ const DashboardPage: React.FC = () => {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
+  const subscriptionUpdateCounter = useAuthStore(
+    (state) => state.subscriptionUpdateCounter
+  );
 
   const fetchSubscription = useCallback(async () => {
+    setIsLoading((prev) => (!prev ? true : prev));
     try {
       const response = await apiClient.get("/billing/subscription");
       setSubscription(response.data);
@@ -33,35 +37,12 @@ const DashboardPage: React.FC = () => {
       } else {
         setSubscription(null);
       }
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    const handleSubscriptionChange = (data?: { status?: string }) => {
-      // Re-fetch subscription data on real-time event from backend.
-      console.log(
-        "WebSocket event received: subscription_changed. Refetching data..."
-      );
-
-      if (data?.status === "canceled") {
-        toast.error(
-          "Your subscription will be canceled at the end of the period."
-        );
-      } else if (data?.status === "updated") {
-        toast.success("Your subscription has been successfully updated!");
-      } else if (data?.status === "deleted") {
-        toast.error("Your subscription has been removed.");
-      }
-
-      fetchSubscription();
-    };
-
-    const initialLoad = async () => {
-      setIsLoading(true);
-      await fetchSubscription();
-      setIsLoading(false);
-    };
-
     const paymentSuccess = searchParams.get("payment_success");
     if (paymentSuccess) {
       toast.success("Payment successful! Your subscription is now active.", {
@@ -71,16 +52,19 @@ const DashboardPage: React.FC = () => {
       setSearchParams(searchParams, { replace: true });
     }
 
-    initialLoad();
+    fetchSubscription();
 
-    socket.on("local_subscription_changed", handleSubscriptionChange);
     window.addEventListener("focus", fetchSubscription);
 
     return () => {
-      socket.off("local_subscription_changed", handleSubscriptionChange);
       window.removeEventListener("focus", fetchSubscription);
     };
-  }, [fetchSubscription, searchParams, setSearchParams]);
+  }, [
+    fetchSubscription,
+    searchParams,
+    setSearchParams,
+    subscriptionUpdateCounter,
+  ]);
 
   return (
     <div className={styles.dashboardContainer}>

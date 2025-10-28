@@ -1,9 +1,13 @@
 import { useEffect } from "react";
 import { socket } from "../lib/socket";
-import { useAuth } from "./useAuth";
+import { useAuthStore } from "../store/auth";
+import toast from "react-hot-toast";
 
 export const useSocket = () => {
-  const { user } = useAuth();
+  const user = useAuthStore((state) => state.user);
+  const triggerSubscriptionUpdate = useAuthStore(
+    (state) => state.triggerSubscriptionUpdate
+  );
 
   useEffect(() => {
     if (user) {
@@ -11,14 +15,22 @@ export const useSocket = () => {
         socket.connect();
       }
 
-      const handleConnect = () => {
-        console.log("Connected to WebSocket server with ID:", socket.id);
-        socket.emit("join_user_room", user.id);
-      };
+      const handleConnect = () => socket.emit("join_user_room", user.id);
 
       const handleSubscriptionChanged = (data?: { status?: string }) => {
-        // Emit a local event that other components can listen to.
-        socket.emit("local_subscription_changed", data);
+        console.log("WebSocket event received on hook:", data);
+
+        if (data?.status === "canceled") {
+          toast.error(
+            "Your subscription will be canceled at the end of the period."
+          );
+        } else if (data?.status === "updated") {
+          toast.success("Your subscription has been successfully updated!");
+        } else if (data?.status === "deleted") {
+          toast.error("Your subscription has been removed.");
+        }
+
+        triggerSubscriptionUpdate();
       };
 
       socket.on("connect", handleConnect);
@@ -33,5 +45,5 @@ export const useSocket = () => {
       socket.off("connect");
       socket.off("subscription_changed");
     };
-  }, [user]);
+  }, [user, triggerSubscriptionUpdate]);
 };
