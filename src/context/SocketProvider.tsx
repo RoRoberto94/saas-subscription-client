@@ -1,36 +1,59 @@
 import React, { useEffect } from "react";
 import { socket } from "../lib/socket";
 import { useAuthStore } from "../store/auth";
-import toast from "react-hot-toast";
 import { SocketContext } from "./SocketContext";
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const user = useAuthStore((state) => state.user);
-  const triggerSubscriptionUpdate = useAuthStore(
-    (state) => state.triggerSubscriptionUpdate
-  );
 
   useEffect(() => {
     if (user) {
       if (!socket.connected) {
         socket.connect();
       }
+
       const handleConnect = () => socket.emit("join_user_room", user.id);
+
       const handleSubscriptionChanged = (data?: { status?: string }) => {
-        console.log("WebSocket event received by provider:", data);
+        console.log("WebSocket event received, storing notification:", data);
+
         if (data?.status === "canceled") {
-          toast.error(
-            "Your subscription will be canceled at the end of the period."
+          localStorage.setItem(
+            "pending_notification",
+            JSON.stringify({
+              type: "error",
+              message: "Your subscription will be canceled.",
+            })
           );
         } else if (data?.status === "updated") {
-          toast.success("Your subscription has been successfully updated!");
+          localStorage.setItem(
+            "pending_notification",
+            JSON.stringify({
+              type: "success",
+              message: "Your subscription has been updated!",
+            })
+          );
         } else if (data?.status === "deleted") {
-          toast.error("Your subscription has been removed.");
+          localStorage.setItem(
+            "pending_notification",
+            JSON.stringify({
+              type: "error",
+              message: "Your subscription has been removed.",
+            })
+          );
+        } else {
+          localStorage.setItem(
+            "pending_notification",
+            JSON.stringify({
+              type: "success",
+              message: "Your new subscription is active!",
+            })
+          );
         }
-        triggerSubscriptionUpdate();
       };
+
       socket.on("connect", handleConnect);
       socket.on("subscription_changed", handleSubscriptionChanged);
     } else {
@@ -38,11 +61,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         socket.disconnect();
       }
     }
+
     return () => {
       socket.off("connect");
       socket.off("subscription_changed");
     };
-  }, [user, triggerSubscriptionUpdate]);
+  }, [user]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

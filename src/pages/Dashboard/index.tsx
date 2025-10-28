@@ -8,7 +8,6 @@ import SubscriptionActive from "../components/SubscriptionActive";
 import NoSubscription from "../components/NoSubscription";
 import { AxiosError } from "axios";
 import Spinner from "../../components/Spinner";
-import { useAuthStore } from "../../store/auth";
 
 interface Subscription {
   id: string;
@@ -22,54 +21,34 @@ const DashboardPage: React.FC = () => {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
-  const subscriptionUpdateCounter = useAuthStore(
-    (state) => state.subscriptionUpdateCounter
-  );
 
-  const fetchSubscription = useCallback(async () => {
-    setIsLoading((prev) => (!prev ? true : prev));
+  const refreshDataAndCheckNotifications = useCallback(async () => {
+    const pendingNotification = localStorage.getItem("pending_notification");
+    if (pendingNotification) {
+      const { type, message } = JSON.parse(pendingNotification);
+      if (type === "success") {
+        toast.success(message);
+      } else {
+        toast.error(message);
+      }
+      localStorage.removeItem("pending_notification");
+    }
+
+    setIsLoading(true);
     try {
       const response = await apiClient.get("/billing/subscription");
       setSubscription(response.data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError && error.response?.status !== 404) {
+    } catch (error) {
+      if (!(error instanceof AxiosError && error.response?.status !== 404)) {
         console.error("Failed to fetch subscription:", error);
-      } else {
-        setSubscription(null);
       }
+      setSubscription(null);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const checkAndShowNotifications = useCallback(() => {
-    const successMsg = localStorage.getItem("pending_notification_success");
-    if (successMsg) {
-      toast.success(successMsg, { duration: 5000 });
-      localStorage.removeItem("pending_notification_success");
-    }
-
-    const errorMsg = localStorage.getItem("pending_notification_error");
-    if (errorMsg) {
-      toast.error(errorMsg, {
-        duration: 5000,
-        iconTheme: {
-          primary: "var(--error-color)",
-          secondary: "#FFFFFF",
-        },
-      });
-      localStorage.removeItem("pending_notification_error");
-    }
-  }, []);
-
   useEffect(() => {
-    const initialLoad = async () => {
-      setIsLoading(true);
-      await fetchSubscription();
-      checkAndShowNotifications();
-      setIsLoading(false);
-    };
-
     const paymentSuccess = searchParams.get("payment_success");
     if (paymentSuccess) {
       toast.success("Payment successful! Your subscription is now active.", {
@@ -79,20 +58,14 @@ const DashboardPage: React.FC = () => {
       setSearchParams(searchParams, { replace: true });
     }
 
-    initialLoad();
+    refreshDataAndCheckNotifications();
 
-    window.addEventListener("focus", checkAndShowNotifications);
+    window.addEventListener("focus", refreshDataAndCheckNotifications);
 
     return () => {
-      window.removeEventListener("focus", checkAndShowNotifications);
+      window.removeEventListener("focus", refreshDataAndCheckNotifications);
     };
-  }, [
-    fetchSubscription,
-    searchParams,
-    setSearchParams,
-    subscriptionUpdateCounter,
-    checkAndShowNotifications,
-  ]);
+  }, [refreshDataAndCheckNotifications, searchParams, setSearchParams]);
 
   return (
     <div className={styles.dashboardContainer}>
